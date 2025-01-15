@@ -11,7 +11,7 @@ import Base: show
 # These are routines that help to create input geometries, such as slabs with a given angle
 #
 
-export  add_box!, add_sphere!, add_ellipsoid!, add_cylinder!, add_layer!, add_polygon!, add_slab!, add_stripes!, add_volcano!, add_fault!,
+export  add_box!, add_sphere!, add_ellipsoid!, add_cylinder!, add_layer!, add_polygon!, add_polygon_xy!, add_slab!, add_stripes!, add_volcano!, add_fault!,
         make_volc_topo,
         ConstantTemp, LinearTemp, HalfspaceCoolingTemp, SpreadingRateTemp, LithosphericTemp, LinearWeightedTemperature,
         McKenzie_subducting_slab,
@@ -748,6 +748,42 @@ function add_polygon!(Phase, Temp, Grid::AbstractGeneralGrid;   # required input
         end
 
         # Set the phase. Different routines are available for that - see below.
+        Phase[ind] = compute_phase(Phase[ind], Temp[ind], X[ind], Y[ind], Z[ind], phase)
+    end
+
+    return nothing
+end
+
+function add_polygon_xy!(Phase, Temp, Grid::AbstractGeneralGrid;   
+    xlim=(), ylim=(), zlim::Tuple = (0.0,0.8),           
+    phase = ConstantPhase(1),                                   
+    T=nothing, segments=nothing, cell=false )                            
+
+    xlim_ = Float64.(collect(xlim))
+    ylim_ = Float64.(collect(ylim))
+    zlim_ = Float64.(collect(zlim))
+
+    X, Y, Z = coordinate_grids(Grid, cell=cell)
+    ind = zeros(Bool, size(X))
+    ind_slice = zeros(Bool, size(X[:, :, 1]))
+
+    for k = 1:size(Z)[3]
+        if Z[1, 1, k] >= zlim_[1] && Z[1, 1, k] <= zlim_[2]
+            inpolygon!(ind_slice, xlim_, ylim_, X[:, :, k], Y[:, :, k])
+            ind[:, :, k] = ind_slice
+        else
+            ind[:, :, k] = zeros(size(X[:, :, 1]))
+        end
+    end
+
+    if !isempty(ind)
+        if T != nothing
+            if segments !== nothing
+                Temp[ind] = compute_thermal_structure(Temp[ind], X[ind], Y[ind], Z[ind], Phase[ind], T, segments)
+            else
+                Temp[ind] = compute_thermal_structure(Temp[ind], X[ind], Y[ind], Z[ind], Phase[ind], T)
+            end
+        end
         Phase[ind] = compute_phase(Phase[ind], Temp[ind], X[ind], Y[ind], Z[ind], phase)
     end
 
