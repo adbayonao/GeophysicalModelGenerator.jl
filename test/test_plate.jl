@@ -1,7 +1,7 @@
 using GeophysicalModelGenerator
 using Test
 
-@testset "Ridge Thermal Structure Tests" begin
+@testset "Plate Tests" begin
     # Grid parameters
     nx, ny, nz = 512, 512, 128
     x = range(-1000, 0, length=nx)
@@ -24,7 +24,7 @@ using Test
     lith = LithosphericPhases(Layers=[15 55], Phases=[1 2], Tlab=1250)
 
     # Replace add_box with add_polygon_xy to allow for arbitrary-shaped ridges
-    add_polygon_xy!(Phases, Temp, Grid; 
+    add_plate!(Phases, Temp, Grid; 
         xlim=(-1000.0, -750.0, -250.0, 0.0, -250.0, -750.0), 
         ylim=(0.0, 500.0, 500.0, 0.0, -500.0, -500.0), 
         zlim=(-150.0, 0.0), 
@@ -34,7 +34,7 @@ using Test
 
     # Add and save results
     Grid = addfield(Grid, (; Phases, Temp))
-    write_paraview(Grid, "Ridge_Thermal_Structure_test_2")
+    write_paraview(Grid, "Plate")
 
     @test minimum(Temp) >= 0.0  # Minimum temperature
     @test maximum(Temp) <= 1350.0  # Maximum temperature

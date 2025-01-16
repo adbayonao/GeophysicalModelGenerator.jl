@@ -11,7 +11,7 @@ import Base: show
 # These are routines that help to create input geometries, such as slabs with a given angle
 #
 
-export  add_box!, add_sphere!, add_ellipsoid!, add_cylinder!, add_layer!, add_polygon!, add_polygon_xy!, add_slab!, add_stripes!, add_volcano!, add_fault!,
+export  add_box!, add_sphere!, add_ellipsoid!, add_cylinder!, add_layer!, add_polygon!, add_plate!, add_slab!, add_stripes!, add_volcano!, add_fault!,
         make_volc_topo,
         ConstantTemp, LinearTemp, HalfspaceCoolingTemp, SpreadingRateTemp, LithosphericTemp, LinearWeightedTemperature,
         McKenzie_subducting_slab,
@@ -754,7 +754,61 @@ function add_polygon!(Phase, Temp, Grid::AbstractGeneralGrid;   # required input
     return nothing
 end
 
-function add_polygon_xy!(Phase, Temp, Grid::AbstractGeneralGrid;   
+"""
+        add_plate!(Phase, Temp, Grid::AbstractGeneralGrid; xlim=(), ylim=(), zlim::Tuple = (0.0,0.8), phase = ConstantPhase(1), T=nothing, segments=nothing, cell=false )
+
+Adds a polygon with phase & temperature structure to a 3D model setup in the xy plane. This function extends the capabilities of `add_polygon!` by allowing the creation of polygons in the xy plane and projecting them along the z-axis, making it particularly useful for creating tectonic plates with varying geometries.
+
+Parameters
+==========
+- `Phase`  - Phase array (consistent with Grid)
+- `Temp`   - Temperature array (consistent with Grid)
+- `Grid`   - Grid structure (usually obtained with read_LaMEM_inputfile)
+- `xlim`   - `x`-coordinate of the polygon points, same ordering as ylim, number of points unlimited
+- `ylim`   - `y`-coordinate of the polygon points, same ordering as xlim, number of points unlimited
+- `zlim`   - `z`-coordinate range for projecting the polygon (start and stop, two values)
+- `phase`  - Specifies the phase of the polygon. See `ConstantPhase()`
+- `T`      - Specifies the temperature of the polygon. See `ConstantTemp()`, `LinearTemp()`, `HalfspaceCoolingTemp()`, `SpreadingRateTemp()`
+- `segments` - Optional. Allows for thermal segmentation within the polygon. Useful for ridge systems or complex thermal structures.
+- `cell`   - If true, `Phase` and `Temp` are defined on cell centers
+
+Example
+========
+
+Polygon in the xy plane with constant phase and temperature:
+
+```julia-repl
+julia> Grid = CartData(xyz_grid(x, y, z))
+
+Grid:
+  nel         : (512, 512, 128)
+  marker/cell : (1, 1, 1)
+  markers     : (512, 512, 128)
+  x           ϵ [-1000.0 : 0.0]
+  y           ϵ [-1000.0 : 1000.0]
+  z           ϵ [-660.0 : 0.0]
+julia> Phases = zeros(Int32,   size(Grid.X))
+julia> Temp   = zeros(Float64, size(Grid.X))
+julia> segments = [
+           ((-500.0, -1000.0), (-500.0, 0.0)),  # Segment 1
+           ((-250.0, 0.0), (-250.0, 200.0)),    # Segment 2
+           ((-750.0, 200.0), (-750.0, 1000.0))  # Segment 3
+       ]
+julia> lith = LithosphericPhases(Layers=[15 55], Phases=[1 2], Tlab=1250)
+julia> add_plate!(Phases, Temp, Grid; 
+           xlim=(-1000.0, -750.0, -250.0, 0.0, -250.0, -750.0), 
+           ylim=(0.0, 500.0, 500.0, 0.0, -500.0, -500.0), 
+           zlim=(-150.0, 0.0), 
+           phase=lith, 
+           T=SpreadingRateTemp(SpreadingVel=3), 
+           segments=segments)
+julia> Grid = addfield(Grid, (; Phases, Temp))  # Add fields
+julia> write_paraview(Grid, "Plate")  # Save model to Paraview
+1-element Vector{String}:
+ "Plate.vts"
+"""
+
+function add_plate!(Phase, Temp, Grid::AbstractGeneralGrid;   
     xlim=(), ylim=(), zlim::Tuple = (0.0,0.8),           
     phase = ConstantPhase(1),                                   
     T=nothing, segments=nothing, cell=false )                            
