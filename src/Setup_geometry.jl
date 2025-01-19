@@ -757,7 +757,8 @@ end
 """
         add_plate!(Phase, Temp, Grid::AbstractGeneralGrid; xlim=(), ylim=(), zlim::Tuple = (0.0,0.8), phase = ConstantPhase(1), T=nothing, segments=nothing, cell=false )
 
-Adds a polygon with phase & temperature structure to a 3D model setup in the xy plane. This function extends the capabilities of `add_polygon!` by allowing the creation of polygons in the xy plane and projecting them along the z-axis, making it particularly useful for creating tectonic plates with varying geometries.
+Adds a tectonic plate with phase and temperature structure to a 3D model setup.
+This function enables the definition of tectonic plates in the xy plane and projects them along the z-axis, providing a flexible approach to model complex plate geometries.
 
 Parameters
 ==========
@@ -767,15 +768,15 @@ Parameters
 - `xlim`   - `x`-coordinate of the polygon points, same ordering as ylim, number of points unlimited
 - `ylim`   - `y`-coordinate of the polygon points, same ordering as xlim, number of points unlimited
 - `zlim`   - `z`-coordinate range for projecting the polygon (start and stop, two values)
-- `phase`  - Specifies the phase of the polygon. See `ConstantPhase()`
-- `T`      - Specifies the temperature of the polygon. See `ConstantTemp()`, `LinearTemp()`, `HalfspaceCoolingTemp()`, `SpreadingRateTemp()`
+- `phase`  - Specifies the phase of the plate. See `ConstantPhase()`
+- `T`      - Specifies the temperature of the plate. See `ConstantTemp()`, `LinearTemp()`, `HalfspaceCoolingTemp()`, `SpreadingRateTemp()`
 - `segments` - Optional. Allows for thermal segmentation within the polygon. Useful for ridge systems or complex thermal structures.
 - `cell`   - If true, `Phase` and `Temp` are defined on cell centers
 
 Example
 ========
 
-Polygon in the xy plane with constant phase and temperature:
+Tectonic plate in the xy plane with phase and temperature structure:
 
 ```julia-repl
 julia> Grid = CartData(xyz_grid(x, y, z))

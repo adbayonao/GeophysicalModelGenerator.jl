@@ -78,6 +78,10 @@ using Test
     	include("test/test_ridge_segments.jl")
     end
 
+    @testset "Plate Tests" begin
+        include("test/test_plate.jl")
+    end
+
     @testset "Waterflow" begin
         include("test_WaterFlow.jl")
     end

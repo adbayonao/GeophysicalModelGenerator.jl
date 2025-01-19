@@ -34,7 +34,7 @@ using Test
 
     # Add and save results
     Grid = addfield(Grid, (; Phases, Temp))
-    write_paraview(Grid, "Plate")
+    #write_paraview(Grid, "Plate")
 
     @test minimum(Temp) >= 0.0  # Minimum temperature
     @test maximum(Temp) <= 1350.0  # Maximum temperature
