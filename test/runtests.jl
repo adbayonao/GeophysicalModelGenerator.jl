@@ -75,11 +75,11 @@ using Test
     end
 
     @testset "Ridge Thermal Structure Tests" begin
-    	include("test/test_ridge_segments.jl")
+    	include("test_ridge_segments.jl")
     end
 
     @testset "Plate Tests" begin
-        include("test/test_plate.jl")
+        include("test_plate.jl")
     end
 
     @testset "Waterflow" begin
