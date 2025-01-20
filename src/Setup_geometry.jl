@@ -814,9 +814,9 @@ function add_plate!(Phase, Temp, Grid::AbstractGeneralGrid;
     phase = ConstantPhase(1),                                   
     T=nothing, segments=nothing, cell=false )                            
 
-    xlim_ = Float64.(collect(xlim))
-    ylim_ = Float64.(collect(ylim))
-    zlim_ = Float64.(collect(zlim))
+    xlim_ = collect(xlim)
+    ylim_ = collect(ylim)
+    zlim_ = collect(zlim)
 
     X, Y, Z = coordinate_grids(Grid, cell=cell)
     ind = zeros(Bool, size(X))
