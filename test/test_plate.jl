@@ -43,5 +43,5 @@ using Test
 
     # Check if phases are correctly assigned in expected regions
     @test first(Phases) == 2  # Example: Verify a point's phase
-    @test last(Phases)  == 2  # Example: Verify another point's phase
+    @test last(Phases)  == 2  # Example: Verify another point's phase.
 end
